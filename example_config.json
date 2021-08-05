@@ -6,6 +6,7 @@
     "brainstem_structures": false,
     "thalamic_nuclei": false,
     "cerebellum":true,
+    "hcp":true,
     "mori":false,
     "aparc2009":false,
     "neuropythy_analysis": false,
