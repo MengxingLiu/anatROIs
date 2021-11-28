@@ -25,3 +25,12 @@ docker run --rm -ti \
 #### Usage Notes ####
 * You must mount the directory (using the `-v` flag) which contains your anatomical data (nifti or dicoms) in the container at `/input/flywheel/v0/input/anatomical` and also mount the directory where you want your output data stored at `/output`, see the example above.
 * Configuration options (including the license key) must be set in the `manifest.json` file **before building** the container.
+
+
+
+The documentation is in the wiki:
+* [Installation](https://github.com/garikoitz/anatROIs/wiki/Installation)
+* [Pipeline documentation](https://github.com/garikoitz/anatROIs/wiki/Pipeline-steps)
+* [Parameter recommendations](https://github.com/garikoitz/anatROIs/wiki/Parameter-recommendations): differences in acquisition sequences or subject populations require to use different parameters, in this page we collect the parameters and pipeline versions we used for better results. 
+* [Reporting and citation](reporting-citation) In this wiki page we include examples of how to report and cite RTP and all the included tools, it will change depending on the selected tools. 
+* [TO-DO list](https://github.com/garikoitz/anatROIs/wiki/TO-DO)
