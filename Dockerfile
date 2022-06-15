@@ -24,7 +24,7 @@ RUN apt-get update && apt-get -y install \
         perl-modules
 
 # Download Freesurfer dev from MGH and untar to /opt
-RUN wget -N -qO- ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.1.1/freesurfer-linux-centos6_x86_64-7.1.1.tar.gz | tar -xz -C /opt && chown -R root:root /opt/freesurfer && chmod -R a+rx /opt/freesurfer
+RUN wget -N -qO- ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer-linux-centos6_x86_64-7.2.0.tar.gz | tar -xz -C /opt && chown -R root:root /opt/freesurfer && chmod -R a+rx /opt/freesurfer
 
 # Make directory for flywheel spec (v0)
 ENV FLYWHEEL /flywheel/v0
@@ -130,7 +130,7 @@ RUN tar -xf AFNI_SUITCerebellum.tgz --directory /flywheel/v0/templates/
 
 # Download the MORI ROIs 
 # New files with the cerebellar peduncles from Lisa Brucket, and new eye ROIs
-RUN wget --retry-connrefused --waitretry=5 --read-timeout=20 --timeout=15 -t 0 -q -O MORI_ROIs.zip "https://osf.io/2hfu8/download"
+RUN wget --retry-connrefused --waitretry=5 --read-timeout=20 --timeout=15 -t 0 -q -O MORI_ROIs.zip "https://osf.io/4bq7g/download"
 RUN mkdir /flywheel/v0/templates/MNI_JHU_tracts_ROIs/ 
 RUN unzip MORI_ROIs.zip -d /flywheel/v0/templates/MNI_JHU_tracts_ROIs/
 
