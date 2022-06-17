@@ -52,9 +52,19 @@ RUN set -x \
 	; } \
 	&& rm -rf /var/lib/apt/lists/*
 
+# The keyserver is failing, doing this to avoid future problems
+# RUN sh -x && for server in ha.pool.sks-keyservers.net \
+#                      hkp://p80.pool.sks-keyservers.net:80 \
+#                      keyserver.ubuntu.com \
+#                      hkp://keyserver.ubuntu.com:80 \
+#                      pgp.mit.edu; do set -x gpg --keyserver "$server" --recv-keys DD95CC430502E37EF840ACEEA5D32F012649A5A9 && break || echo "Trying new server..."; done 
+# ENV server "hkp://p80.pool.sks-keyservers.net:80" 
+# ENV server "ha.pool.sks-keyservers.net" 
+ENV server "keyserver.ubuntu.com" 
+
 RUN set -x \
 	&& export GNUPGHOME="$(mktemp -d)" \
-	&& gpg --keyserver ha.pool.sks-keyservers.net --recv-keys DD95CC430502E37EF840ACEEA5D32F012649A5A9 \
+    && gpg --keyserver "${server}" --recv-keys DD95CC430502E37EF840ACEEA5D32F012649A5A9 \
 	&& gpg --export DD95CC430502E37EF840ACEEA5D32F012649A5A9 > /etc/apt/trusted.gpg.d/neurodebian.gpg \
 	&& rm -rf "$GNUPGHOME" \
 	&& apt-key list | grep neurodebian
@@ -130,19 +140,22 @@ RUN tar -xf AFNI_SUITCerebellum.tgz --directory /flywheel/v0/templates/
 
 # Download the MORI ROIs 
 # New files with the cerebellar peduncles from Lisa Brucket, and new eye ROIs
-RUN wget --retry-connrefused --waitretry=5 --read-timeout=20 --timeout=15 -t 0 -q -O MORI_ROIs.zip "https://osf.io/4bq7g/download"
-RUN mkdir /flywheel/v0/templates/MNI_JHU_tracts_ROIs/ 
-RUN unzip MORI_ROIs.zip -d /flywheel/v0/templates/MNI_JHU_tracts_ROIs/
+# RUN echo "${PWD}"
+# RUN ls -lahtr
+RUN wget --retry-connrefused --waitretry=5 --read-timeout=20 --timeout=15 -t 0 --no-check-certificate -O "${FLYWHEEL}/MORI_ROIs.zip" "https://osf.io/4bq7g/download" \
+  && mkdir /flywheel/v0/templates/MNI_JHU_tracts_ROIs/ \
+  && unzip "${FLYWHEEL}/MORI_ROIs.zip" -d /flywheel/v0/templates/MNI_JHU_tracts_ROIs/ \
+  && rm "${FLYWHEEL}/MORI_ROIs.zip"
 
 # Add Thalamus FS LUT
 COPY FreesurferColorLUT_THALAMUS.txt /flywheel/v0/templates/FreesurferColorLUT_THALAMUS.txt
 
 ## Add HCP Atlas and LUT
 # Download LUT
-RUN wget --retry-connrefused --waitretry=5 --read-timeout=20 --timeout=15 -t 0 -q -O LUT_HCP.txt "https://osf.io/rdvfk/download"
+RUN wget --retry-connrefused --waitretry=5 --read-timeout=20 --timeout=15 -t 0  --no-check-certificate -O LUT_HCP.txt "https://osf.io/rdvfk/download"
 RUN cp LUT_HCP.txt /flywheel/v0/templates/LUT_HCP.txt
 
-RUN wget --retry-connrefused --waitretry=5 --read-timeout=20 --timeout=15 -t 0 -q -O MNI_Glasser_HCP_v1.0.nii.gz "https://osf.io/7vjz9/download"
+RUN wget --retry-connrefused --waitretry=5 --read-timeout=20 --timeout=15 -t 0  --no-check-certificate -O MNI_Glasser_HCP_v1.0.nii.gz "https://osf.io/7vjz9/download"
 RUN cp MNI_Glasser_HCP_v1.0.nii.gz /flywheel/v0/templates/MNI_Glasser_HCP_v1.0.nii.gz
 
 ## setup ants SyN.sh
