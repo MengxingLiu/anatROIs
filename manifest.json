@@ -9,12 +9,12 @@
   "cite": "For citation information, please visit: https://www.biorxiv.org/content/10.1101/2022.03.17.484761v1",
   "license": "Other",
   "flywheel": "0",
-  "version": "4.3.0-7.2.0",
+  "version": "4.3.1-7.2.0",
   "custom": {
-    "docker-image": "garikoitz/anatrois:4.3.0-7.2.0",
+    "docker-image": "garikoitz/anatrois:4.3.1-7.2.0",
     "gear-builder": {
         "category": "analysis",
-        "image": "garikoitz/anatrois:4.3.0-7.2.0"
+        "image": "garikoitz/anatrois:4.3.1-7.2.0"
     },
     "flywheel": {
       "suite": "RTP2: Reproducible Tract Profiles"

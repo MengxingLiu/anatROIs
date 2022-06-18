@@ -102,6 +102,7 @@ RUN apt-get update && apt-get install -y --force-yes \
 # The brainstem and hippocampal subfield modules in FreeSurfer-dev require the Matlab R2014b runtime
 RUN apt-get install -y libxt-dev libxmu-dev
 ENV FREESURFER_HOME /opt/freesurfer
+ENV FREESURFER /opt/freesurfer
 
 RUN wget -N -qO- "https://surfer.nmr.mgh.harvard.edu/fswiki/MatlabRuntime?action=AttachFile&do=get&target=runtime2014bLinux.tar.gz" | tar -xz -C $FREESURFER_HOME && chown -R root:root /opt/freesurfer/MCRv84 && chmod -R a+rx /opt/freesurfer/MCRv84
 

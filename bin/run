@@ -31,6 +31,7 @@ export FSF_OUTPUT_FORMAT=nii.gz
 export MNI_DIR=/opt/freesurfer/mni
 export LOCAL_DIR=/opt/freesurfer/local
 export FREESURFER_HOME=/opt/freesurfer
+export FREESURFER=/opt/freesurfer
 export FSFAST_HOME=/opt/freesurfer/fsfast
 export MINC_BIN_DIR=/opt/freesurfer/mni/bin
 export MINC_LIB_DIR=/opt/freesurfer/mni/lib
