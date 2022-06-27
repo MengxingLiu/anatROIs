@@ -16,13 +16,14 @@ set +o verbose   # Command echo off
 # If run in debug mode, just exec bash:
 if [ "$1" = "DEBUG" ]
     then exec /bin/bash
-elif [ "$1" = "-h" ] || [ "$1" = "--help" ] || [ "$1" = "-help" ] || [ "$1" = "help" ]
+fi
+if [ "$1" = "-h" ] || [ "$1" = "--help" ] || [ "$1" = "-help" ] || [ "$1" = "help" ]
     then cat /opt/help.txt
     exit 0
-else
-    source /opt/conda/etc/profile.d/conda.sh
-    conda activate scientific
 fi
+# If it does not stop in the anteior part, then do this
+source /opt/conda/etc/profile.d/conda.sh
+conda activate scientific
 
 ###############################################################################
 # Utilities
@@ -377,14 +378,22 @@ fi
 ###############################################################################
 # Optional Segmentations
 
+# This will be a considerable time saver. 
+# When ANTs has been run, it saves info in the FS folder. 
+# Before running any of the below transformations, check that the required files are not already there. 
+
+
+
 # Segmentation of Cerebellum 
 if [[ ${CEREBELLUM} == "True" ]]; then
   echo -e "$CONTAINER starting segmentation of cerebellum"
-  # Create binary mask of brainmask.mgz and MNI_152
-  mri_convert ${MRI_DIR}/brainmask.mgz ${MRI_DIR}/brainmask.nii.gz
-  # calculate the transformation
-  antsRegistrationSyN.sh -d 3 -o ${MRI_DIR}/ants                                \
+  if [[ ! -f  ${MRI_DIR}/ants1Warp.nii.gz ]]; then 
+    # Create binary mask of brainmask.mgz and MNI_152
+    mri_convert  ${MRI_DIR}/brainmask.mgz ${MRI_DIR}/brainmask.nii.gz
+    # calculate the transformation
+    antsRegistrationSyN.sh -d 3 -o ${MRI_DIR}/ants                          \
         -f ${MRI_DIR}/brainmask.nii.gz -m ${MORI_DIR}/FSL_MNI152_FreeSurferConformed_1mm.nii.gz
+  fi
   # apply both affine and nonlinear transofrmation
   antsApplyTransforms -d 3                                                      \
         -i ${TEMPLATES}/Cerebellum-MNIsegment.nii.gz                            \
@@ -401,13 +410,13 @@ fi
 # TODO: add e
 if [[ ${MORI} == "True" ]]; then
   echo -e "$CONTAINER starting transform MORI"
-  if [[ ${CEREBELLUM} != "True" ]]; then
+  # if [[ ${CEREBELLUM} != "True" ]]; then  # This was a bad check, check if the transform file is there
+  if [[ ! -f  ${MRI_DIR}/ants1Warp.nii.gz ]]; then 
     # Create binary mask of brainmask.mgz and MNI_152
     mri_convert  ${MRI_DIR}/brainmask.mgz ${MRI_DIR}/brainmask.nii.gz
     # calculate the transformation
     antsRegistrationSyN.sh -d 3 -o ${MRI_DIR}/ants                          \
         -f ${MRI_DIR}/brainmask.nii.gz -m ${MORI_DIR}/FSL_MNI152_FreeSurferConformed_1mm.nii.gz
-    # apply both affine and nonlinear transofrmation
   fi
   for ROI in `ls ${MORI_DIR}/*`; do
   	if [[ $ROI == ${MORI_DIR}/FSL_MNI152_FreeSurferConformed_1mm.nii.gz ]];then
@@ -432,7 +441,7 @@ fi
 # transform HCP atlas to native space
 if [[ ${HCP} == "True" ]]; then
   echo -e "$CONTRAINER starting transform HCP atlas to native space"
-  if [[ ${CEREBELLUM} != "True" ]]; then
+  if [[ ! -f  ${MRI_DIR}/ants1Warp.nii.gz ]]; then 
     # Create binary mask of brainmask.mgz and MNI_152
     mri_convert  ${MRI_DIR}/brainmask.mgz ${MRI_DIR}/brainmask.nii.gz
     # calculate the transformation
@@ -504,6 +513,7 @@ if [[ ${THALAMUS} == "True" ]]; then
         export LD_LIBRARY_PATH=""
         echo "$CONTAINER This is LD_LIBRARY_PATH: $LD_LIBRARY_PATH "
         # aseg is different, change it, required for Thalamic Segmentation
+        conda activate scientific
         ${FLYWHEEL_BASE}/fix_aseg_if_infant.py -mriDir ${MRI_DIR}
 
 
@@ -539,7 +549,7 @@ if [[ ${NEUROPYTHY} == "True" ]]; then
     # Matlab installation interfers with neuropythy execution.
     SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=
-    
+    conda activate scientific 
     python -m neuropythy atlas --verbose --volume-export "${SUBJECT_ID}"
     
     export LD_LIBRARY_PATH=$SAVE_LD_LIBRARY_PATH
@@ -753,6 +763,9 @@ fi
 
 
 ##############################################################################
+# The activation of conda it seems it does not work always as expect
+# run it here just in case
+conda activate scientific
 # Write ROIs separately into individual files
 if [[ -f  ${OUTPUT_DIR}/aparc+aseg.nii.gz ]]; then
     cp ${OUTPUT_DIR}/aparc+aseg.nii.gz   ${FS_DIR}/aparc+aseg.nii.gz
@@ -781,6 +794,7 @@ fi
 if [[ ${HCP} == "True" ]]; then
     # separate ROIs
     cp ${OUTPUT_DIR}/Glasser_HCP_v1.0.nii.gz ${FS_DIR}/Glasser_HCP_v1.0.nii.gz
+
     ${FLYWHEEL_BASE}/separateROIs.py -hcp ${FS_DIR}/Glasser_HCP_v1.0.nii.gz \
                                      -hcpLUT ${TEMPLATES}/LUT_HCP.txt
     # create motor and auditory cortex ROIs
