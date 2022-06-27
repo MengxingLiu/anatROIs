@@ -9,48 +9,80 @@
 #
 FROM ubuntu:xenial
 
-# Install dependencies for FreeSurfer
-RUN apt-get update && apt-get -y install \
-        bc \
-        tar \
-        zip \
-        wget \
-        gawk \
-        tcsh \
-        python \
-        libgomp1 \
-        python2.7 \
-        python-pip \
-        perl-modules
-
-# Download Freesurfer dev from MGH and untar to /opt
-RUN wget -N -qO- ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer-linux-centos6_x86_64-7.2.0.tar.gz | tar -xz -C /opt && chown -R root:root /opt/freesurfer && chmod -R a+rx /opt/freesurfer
-
 # Make directory for flywheel spec (v0)
 ENV FLYWHEEL /flywheel/v0
 RUN mkdir -p ${FLYWHEEL}
 WORKDIR ${FLYWHEEL}
+RUN mkdir /flywheel/v0/templates/
 
 
+
+# Install dependencies
 RUN apt-get update --fix-missing \
  && apt-get install -y wget bzip2 ca-certificates \
-      libglib2.0-0 libxext6 libsm6 libxrender1 \
-      git mercurial subversion curl grep sed dpkg gcc g++ libeigen3-dev zlib1g-dev libqt4-opengl-dev libgl1-mesa-dev libfftw3-dev libtiff5-dev
-RUN apt-get install -y libxt6 libxcomposite1 libfontconfig1 libasound2
+      libglib2.0-0 \
+      libxext6 \
+      libsm6 \
+      libxrender1 \
+      git \
+      mercurial \
+      subversion \
+      curl \
+      grep \
+      sed \
+      dpkg \
+      gcc \
+      g++ \
+      libeigen3-dev \
+      zlib1g-dev \
+      libqt4-opengl-dev \
+      libgl1-mesa-dev \
+      libfftw3-dev \
+      libtiff5-dev
+RUN apt-get install -y \
+      libxt6 \
+      libxcomposite1 \
+      libfontconfig1 \
+      libasound2 \
+      bc \
+      tar \
+      zip \
+      unzip \
+      tcsh \
+      libgomp1 \
+      python-pip \
+      perl-modules
+
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+    xvfb \
+    xfonts-100dpi \
+    xfonts-75dpi \
+    xfonts-cyrillic \
+    python \
+    imagemagick \
+    wget \
+    subversion\
+    vim \
+    bsdtar
+
+
+# Download Freesurfer dev from MGH and untar to /opt
+RUN wget -N -qO- ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.2.0/freesurfer-linux-centos6_x86_64-7.2.0.tar.gz | tar -xz -C /opt && chown -R root:root /opt/freesurfer && chmod -R a+rx /opt/freesurfer
 
 ###########################
 # Configure neurodebian (https://github.com/neurodebian/dockerfiles/blob/master/dockerfiles/xenial-non-free/Dockerfile)
 RUN set -x \
-	&& apt-get update \
-	&& { \
-		which gpg \
-		|| apt-get install -y --no-install-recommends gnupg \
-	; } \
-	&& { \
-		gpg --version | grep -q '^gpg (GnuPG) 1\.' \
-		|| apt-get install -y --no-install-recommends dirmngr \
-	; } \
-	&& rm -rf /var/lib/apt/lists/*
+    && apt-get update \
+    && { \
+        which gpg \
+        || apt-get install -y --no-install-recommends gnupg \
+    ; } \
+    && { \
+        gpg --version | grep -q '^gpg (GnuPG) 1\.' \
+        || apt-get install -y --no-install-recommends dirmngr \
+    ; } \
+    && rm -rf /var/lib/apt/lists/*
 
 # The keyserver is failing, doing this to avoid future problems
 # RUN sh -x && for server in ha.pool.sks-keyservers.net \
@@ -63,42 +95,25 @@ RUN set -x \
 ENV server "keyserver.ubuntu.com" 
 
 RUN set -x \
-	&& export GNUPGHOME="$(mktemp -d)" \
+    && export GNUPGHOME="$(mktemp -d)" \
     && gpg --keyserver "${server}" --recv-keys DD95CC430502E37EF840ACEEA5D32F012649A5A9 \
-	&& gpg --export DD95CC430502E37EF840ACEEA5D32F012649A5A9 > /etc/apt/trusted.gpg.d/neurodebian.gpg \
-	&& rm -rf "$GNUPGHOME" \
-	&& apt-key list | grep neurodebian
+    && gpg --export DD95CC430502E37EF840ACEEA5D32F012649A5A9 > /etc/apt/trusted.gpg.d/neurodebian.gpg \
+    && rm -rf "$GNUPGHOME" \
+    && apt-key list | grep neurodebian
 
 RUN { \
-	echo 'deb http://neuro.debian.net/debian xenial main'; \
-	echo 'deb http://neuro.debian.net/debian data main'; \
-	echo '#deb-src http://neuro.debian.net/debian-devel xenial main'; \
+    echo 'deb http://neuro.debian.net/debian xenial main'; \
+    echo 'deb http://neuro.debian.net/debian data main'; \
+    echo '#deb-src http://neuro.debian.net/debian-devel xenial main'; \
 } > /etc/apt/sources.list.d/neurodebian.sources.list
 
 RUN sed -i -e 's,main *$,main contrib non-free,g' /etc/apt/sources.list.d/neurodebian.sources.list; grep -q 'deb .* multiverse$' /etc/apt/sources.list || sed -i -e 's,universe *$,universe multiverse,g' /etc/apt/sources.list
 
 
 ############################
-# Install dependencies
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt-get update && apt-get install -y --force-yes \
-    xvfb \
-    xfonts-100dpi \
-    xfonts-75dpi \
-    xfonts-cyrillic \
-    zip \
-    unzip \
-    python \
-    imagemagick \
-    wget \
-    subversion \
-    jq \
-	vim \
-	bsdtar \
-    ants
-	
+# Install andts, it seems it is not installed before neurodebian
+RUN apt-get update -y && apt-get install -y ants
 
-############################
 # The brainstem and hippocampal subfield modules in FreeSurfer-dev require the Matlab R2014b runtime
 RUN apt-get install -y libxt-dev libxmu-dev
 ENV FREESURFER_HOME /opt/freesurfer
@@ -106,29 +121,39 @@ ENV FREESURFER /opt/freesurfer
 
 RUN wget -N -qO- "https://surfer.nmr.mgh.harvard.edu/fswiki/MatlabRuntime?action=AttachFile&do=get&target=runtime2014bLinux.tar.gz" | tar -xz -C $FREESURFER_HOME && chown -R root:root /opt/freesurfer/MCRv84 && chmod -R a+rx /opt/freesurfer/MCRv84
 
-RUN apt-get install python-pip
 # Install neuropythy
+# (here it comes the update to python 3 for Neuropythy)
+# Install miniconda
+ENV CONDA_DIR /opt/conda
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
+     /bin/bash ~/miniconda.sh -b -p /opt/conda
 
-ENV neuropythyCOMMIT=4dd300aca611bbc11a461f4c39d8548d7678d96c
-RUN curl -#L https://github.com/noahbenson/neuropythy/archive/$neuropythyCOMMIT.zip | bsdtar -xf- -C /usr/lib
-WORKDIR /usr/lib/
-RUN mv neuropythy-$neuropythyCOMMIT neuropythy
-RUN chmod -R +rwx /usr/lib/neuropythy
+# Put conda in path so we can use conda activate
+ENV PATH=$CONDA_DIR/bin:$PATH
+# (think about fixing the conda version as well)
+RUN conda update -n base -c defaults conda
+
+# install conda env
+COPY conda_config/scientific.yml .
+RUN conda env create -f scientific.yml
+
+
+# Remove neuropyth install from here, it is in the scientific.yml
+# ENV neuropythyCOMMIT=4dd300aca611bbc11a461f4c39d8548d7678d96c
+# RUN curl -#L https://github.com/noahbenson/neuropythy/archive/$neuropythyCOMMIT.zip | bsdtar -xf- -C /usr/lib
+# WORKDIR /usr/lib/
+# RUN mv neuropythy-$neuropythyCOMMIT neuropythy
+# RUN chmod -R +rwx /usr/lib/neuropythy
 # RUN pip install --upgrade pip && \
-#	pip2.7 install numpy && \
-#	pip2.7 install nibabel && \
-#	pip2.7 install scipy && \
+#   pip2.7 install numpy && \
+#   pip2.7 install nibabel && \
+#   pip2.7 install scipy && \
 #   pip2.7 install -e /usr/lib/neuropythy
-RUN wget  https://bootstrap.pypa.io/pip/2.7/get-pip.py && python get-pip.py
-RUN pip2 install numpy && \
-	pip2 install nibabel && \
-	pip2 install scipy && \
-    pip2 install -e /usr/lib/neuropythy
-
-# Make directory for flywheel spec (v0)
-ENV FLYWHEEL /flywheel/v0
-RUN mkdir -p ${FLYWHEEL}
-RUN mkdir /flywheel/v0/templates/
+# RUN wget  https://bootstrap.pypa.io/pip/2.7/get-pip.py && python get-pip.py
+# RUN pip2 install numpy && \
+#   pip2 install nibabel && \
+#   pip2 install scipy && \
+#   pip2 install -e /usr/lib/neuropythy
 
 
 
@@ -174,15 +199,10 @@ RUN chmod +x /usr/bin/fixAllSegmentations
 # I copied the file and removed those lines as said by Eugenio and checking the whole thing now
 COPY compiled/segmentThalamicNuclei.sh /opt/freesurfer/bin/segmentThalamicNuclei.sh
 
-
-
-
-
-# Copy and configure run script and metadata code
 COPY bin/run \
       bin/parse_config.py \
-	  bin/separateROIs.py \
-	  bin/fix_aseg_if_infant.py \
+      bin/separateROIs.py \
+      bin/fix_aseg_if_infant.py \
       bin/srf2obj \
       manifest.json \
       ${FLYWHEEL}/
@@ -191,7 +211,7 @@ COPY bin/run \
 RUN chmod +x \
       ${FLYWHEEL}/run \
       ${FLYWHEEL}/parse_config.py \
-	  ${FLYWHEEL}/separateROIs.py \
+      ${FLYWHEEL}/separateROIs.py \
       ${FLYWHEEL}/fix_aseg_if_infant.py \
       ${FLYWHEEL}/srf2obj \
       ${FLYWHEEL}/manifest.json
