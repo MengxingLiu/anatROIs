@@ -200,6 +200,7 @@ RUN chmod +x /usr/bin/fixAllSegmentations
 COPY compiled/segmentThalamicNuclei.sh /opt/freesurfer/bin/segmentThalamicNuclei.sh
 
 COPY bin/run \
+      bin/run.py \
       bin/parse_config.py \
       bin/separateROIs.py \
       bin/fix_aseg_if_infant.py \
@@ -211,6 +212,7 @@ COPY bin/run \
 RUN chmod +x \
       ${FLYWHEEL}/run \
       ${FLYWHEEL}/parse_config.py \
+      ${FLYWHEEL}/run.py \
       ${FLYWHEEL}/separateROIs.py \
       ${FLYWHEEL}/fix_aseg_if_infant.py \
       ${FLYWHEEL}/srf2obj \
