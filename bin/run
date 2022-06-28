@@ -513,7 +513,6 @@ if [[ ${THALAMUS} == "True" ]]; then
         export LD_LIBRARY_PATH=""
         echo "$CONTAINER This is LD_LIBRARY_PATH: $LD_LIBRARY_PATH "
         # aseg is different, change it, required for Thalamic Segmentation
-        conda activate scientific
         ${FLYWHEEL_BASE}/fix_aseg_if_infant.py -mriDir ${MRI_DIR}
 
 
@@ -541,7 +540,15 @@ if [[ ${THALAMUS} == "True" ]]; then
 
 fi
 
-export LD_LIBRARY_PATH=""
+# export LD_LIBRARY_PATH=""
+
+
+# Run the conda config again, to be sure we are using the right python
+conda deactivate
+source /opt/conda/etc/profile.d/conda.sh
+conda activate scientific
+python --version
+
 
 # Neuropythy retino-template algorithm
 if [[ ${NEUROPYTHY} == "True" ]]; then
@@ -549,9 +556,11 @@ if [[ ${NEUROPYTHY} == "True" ]]; then
     # Matlab installation interfers with neuropythy execution.
     SAVE_LD_LIBRARY_PATH=$LD_LIBRARY_PATH
     export LD_LIBRARY_PATH=
-    conda activate scientific 
-    python -m neuropythy atlas --verbose --volume-export "${SUBJECT_ID}"
-    
+    # With new version sometimes does not found the atlas, weird...
+    # Do it in python as regardless we are going to move all to python functions
+    # python -m neuropythy atlas --verbose --volume-export "${SUBJECT_ID}"
+    # I will call the whole function run.py as little by little it will be incorporating all the bash functions
+    python ${FLYWHEEL_BASE}/run.py "$CONFIG_FILE" || die "Python startup script failed!" 
     export LD_LIBRARY_PATH=$SAVE_LD_LIBRARY_PATH
 fi
 ###############################################################################
@@ -763,9 +772,13 @@ fi
 
 
 ##############################################################################
-# The activation of conda it seems it does not work always as expect
-# run it here just in case
+# Run the conda config again, to be sure we are using the right python
+conda deactivate
+source /opt/conda/etc/profile.d/conda.sh
 conda activate scientific
+python --version
+
+
 # Write ROIs separately into individual files
 if [[ -f  ${OUTPUT_DIR}/aparc+aseg.nii.gz ]]; then
     cp ${OUTPUT_DIR}/aparc+aseg.nii.gz   ${FS_DIR}/aparc+aseg.nii.gz
@@ -820,6 +833,7 @@ if [[ ${HCP} == "True" ]]; then
 fi
 
 if [[ ${NEUROPYTHY} == "True" ]]; then
+    echo "Separating ROIs from Neuropythy with separateROIs.py -benV option"
     cp ${OUTPUT_DIR}/benson14_varea.nii.gz  ${FS_DIR}/benson14_varea.nii.gz
     ${FLYWHEEL_BASE}/separateROIs.py -benV ${FS_DIR}/benson14_varea.nii.gz
 
