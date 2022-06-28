@@ -1,6 +1,7 @@
-#!/usr/bin/env python2.7
-# Create the two hemispheres
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
+# Create the two hemispheres
 def createHemiMaskFromAseg(asegFile):
     import os
     import nibabel as nib
