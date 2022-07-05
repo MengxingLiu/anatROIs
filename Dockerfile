@@ -115,7 +115,7 @@ RUN sed -i -e 's,main *$,main contrib non-free,g' /etc/apt/sources.list.d/neurod
 RUN apt-get update -y && apt-get install -y ants
 
 # The brainstem and hippocampal subfield modules in FreeSurfer-dev require the Matlab R2014b runtime
-RUN apt-get install -y libxt-dev libxmu-dev
+RUN apt-get install -y libxt-dev libxmu-dev gawk
 ENV FREESURFER_HOME /opt/freesurfer
 ENV FREESURFER /opt/freesurfer
 
