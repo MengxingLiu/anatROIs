@@ -562,6 +562,7 @@ if [[ ${NEUROPYTHY} == "True" ]]; then
     # I will call the whole function run.py as little by little it will be incorporating all the bash functions
     python ${FLYWHEEL_BASE}/run.py "$CONFIG_FILE" || die "Python startup script failed!" 
     export LD_LIBRARY_PATH=$SAVE_LD_LIBRARY_PATH
+    echo -e "$CONTAINER  ... ended Neuropythy."
 fi
 ###############################################################################
 # Optional registrations
