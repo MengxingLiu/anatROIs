@@ -214,7 +214,7 @@ if not path.isfile(path.join(fsDir, 'surf', 'lh.benson14_varea.mgz')):
     try:
         print('Letting Neuropythy work...')
         os.chdir(outDir)
-        atlas.main(f'{subject_id}')
+        atlas.main(f'{subject_id}','--volume-export')
         os.chdir(path.expanduser('~'))
     except:
         die('Neuropythy failed!')
