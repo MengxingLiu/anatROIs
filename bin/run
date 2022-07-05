@@ -922,6 +922,7 @@ rm -rf $OUTPUT_DIR/$SUBJECT_ID
 # Now compress the FS_DIR that will be input to the rtp_pipeline
 zip -r fs.zip fs
 rm -rf $OUTPUT_DIR/fs
+rm -rf $OUTPUT_DIR/templates
 
 # Delete the tmp MCR folder, it breaks FW and wastes space
 rm -rf $OUTPUT_DIR/$MCR_CACHE_FOLDER_NAME
