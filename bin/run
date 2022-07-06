@@ -210,6 +210,22 @@ fi
 
 
 
+# Several programs downstream need to have fsaverage, do it for all here and at the end unlink/delete it
+
+# Create symbolink link to fsaverage to the output folder
+fsaveragelink=${OUTPUT_DIR}/fsaverage
+# ln -s $FREESURFER_HOME/subjects/fsaverage $fsaveragelink
+# Error thrown with ln, try copying, singularity problem, not docker
+# Check if the symbolic link exists, if so, unlink it
+if [[ -L ${fsaveragelink} && -d ${fsaveragelink} ]]; then
+    echo "Unlinking existing link to fsaverage"
+    unlink ${fsaveragelink}
+fi
+if [[ ! -d ${fsaveragelink}  ]]; then
+    echo "Copying fsaverage"
+    cp -r $FREESURFER_HOME/subjects/fsaverage ${OUTPUT_DIR}
+fi
+    
 
 
 
@@ -298,8 +314,6 @@ if [[ ${DO_FS} == "True" ]]; then
         echo -e "${command}"
         eval $command
         
-        # Remove the symbolic link
-        unlink ${OUTPUT_DIR}/fsaverage
 
     fi
     if [[ $? != 0 ]]; then
@@ -558,9 +572,9 @@ if [[ ${NEUROPYTHY} == "True" ]]; then
     export LD_LIBRARY_PATH=
     # With new version sometimes does not found the atlas, weird...
     # Do it in python as regardless we are going to move all to python functions
-    # python -m neuropythy atlas --verbose --volume-export "${SUBJECT_ID}"
+    python -m neuropythy atlas --verbose --volume-export "${SUBJECT_ID}"
     # I will call the whole function run.py as little by little it will be incorporating all the bash functions
-    python ${FLYWHEEL_BASE}/run.py "$CONFIG_FILE" || die "Python startup script failed!" 
+    # python ${FLYWHEEL_BASE}/run.py "$CONFIG_FILE"  
     export LD_LIBRARY_PATH=$SAVE_LD_LIBRARY_PATH
     echo -e "$CONTAINER  ... ended Neuropythy."
 fi
@@ -691,21 +705,6 @@ if [[ ${DO_ANNOT} == "True" ]]; then
     if [[ ! -d ${labeldirtmp} ]]; then
         mkdir ${labeldirtmp}
     fi
-
-    # Create symbolink link to fsaverage to the output folder
-    fsaveragelink=${OUTPUT_DIR}/fsaverage
-    # ln -s $FREESURFER_HOME/subjects/fsaverage $fsaveragelink
-    # Error thrown with ln, try copying, singularity problem, not docker
-    # Check if the symbolic link exists, if so, unlink it
-    if [[ -L ${fsaveragelink} && -d ${fsaveragelink} ]]; then
-        echo "Unlinking existing link to fsaverage"
-        unlink ${fsaveragelink}
-    fi
-    if [[ ! -d ${fsaveragelink}  ]]; then
-        echo "Copying fsaverage"
-        cp -r $FREESURFER_HOME/subjects/fsaverage ${OUTPUT_DIR}
-    fi
-    
     # Convert the annot from fsaverage to the individual subject space
     for annot in `ls ${ANNOTDIRS}/*`; do
         ANNOTname=$(basename -- "$annot"); ANNOTname="${ANNOTname%.annot}"
@@ -739,10 +738,6 @@ if [[ ${DO_ANNOT} == "True" ]]; then
                           mul ${OUTPUT_DIR}/${SUBJECT_ID}/mri/${hemi}.ribbon.mgz    
         done
     done
-    # Remove the symbolic link 
-    # unlink $fsaveragelink
-    # Delete fsaverage folder copy
-    rm -rf ${fsaveragelink}
 fi
 
 
@@ -928,6 +923,10 @@ rm -rf $OUTPUT_DIR/templates
 # Delete the tmp MCR folder, it breaks FW and wastes space
 rm -rf $OUTPUT_DIR/$MCR_CACHE_FOLDER_NAME
 
+# Remove the symbolic link 
+# unlink $fsaveragelink
+# Delete fsaverage folder copy
+rm -rf ${fsaveragelink}
 
 ###############################################################################
 # FINISH
