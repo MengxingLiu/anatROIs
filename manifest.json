@@ -9,12 +9,12 @@
   "cite": "For citation information, please visit: https://www.biorxiv.org/content/10.1101/2022.03.17.484761v1",
   "license": "Other",
   "flywheel": "0",
-  "version": "4.3.3-7.2.0",
+  "version": "4.4.0_7.2.0",
   "custom": {
-    "docker-image": "garikoitz/anatrois:4.3.3-7.2.0",
+    "docker-image": "garikoitz/anatrois:4.4.0_7.2.0",
     "gear-builder": {
         "category": "analysis",
-        "image": "garikoitz/anatrois:4.3.3-7.2.0"
+        "image": "garikoitz/anatrois:4.4.0_7.2.0"
     },
     "flywheel": {
       "suite": "RTP2: Reproducible Tract Profiles"
@@ -182,6 +182,11 @@
     "convert_stats": {
       "description": "Convert FreeSurfer stats files to CSV. (Default=true). Converts a subcortical stats file created by recon-all and/or mri_segstats (eg, aseg.stats) into a table in which each line is a subject and each column is a segmentation. The values are the volume of the segmentation in mm3 or the mean intensity over the structure. Also Converts a cortical stats file created by recon-all and or mris_anatomical_stats (eg, ?h.aparc.stats) into a table in which each line is a subject and each column is a parcellation. By default, the values are the area of the parcellation in mm2.",
       "default": true,
+      "type": "boolean"
+    },
+    "run_gtmseg": {
+      "description": "Run gtmseg, it is a step required for PETsurfer. By default, is false.",
+      "default": false,
       "type": "boolean"
     },
     "freesurfer_license": {

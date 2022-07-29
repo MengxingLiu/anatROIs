@@ -118,6 +118,7 @@ REGISTER_SURFACES=$(${FLYWHEEL_BASE}/parse_config.py --json_file=${CONFIG_FILE} 
 CEREBELLUM=$(${FLYWHEEL_BASE}/parse_config.py --json_file=${CONFIG_FILE} -e)
 MORI=$(${FLYWHEEL_BASE}/parse_config.py --json_file=${CONFIG_FILE} -m)
 APARC2009=$(${FLYWHEEL_BASE}/parse_config.py --json_file=${CONFIG_FILE} -aparc2009)
+GTMSEG=$(${FLYWHEEL_BASE}/parse_config.py --json_file=${CONFIG_FILE} -run_gtmseg)
 # Make and link the subject's directory
 WORK_DIR=${OUTPUT_DIR}/"${SUBJECT_ID}"
 #ln -sfn ${SUBJECTS_DIR}/"${SUBJECT_ID}" ${WORK_DIR}
@@ -391,6 +392,13 @@ fi
 
 ###############################################################################
 # Optional Segmentations
+
+# Segmentation of Cerebellum 
+if [[ ${GTMSEG} == "True" ]]; then
+  echo -e "$CONTAINER starting gtmseg, required for PETsurfer"
+  gtmseg --s ${SUBJECT_ID}
+fi 
+
 
 # This will be a considerable time saver. 
 # When ANTs has been run, it saves info in the FS folder. 
@@ -682,6 +690,11 @@ if [[ $CONVERT_VOLUMES == "True" ]]; then
                    benson14_eccen.mgz
                    benson14_sigma.mgz
                    benson14_angle.mgz"
+  fi
+
+  if [[ ${GTMSEG} == "True" ]]; then
+    mri_mgz_files="$mri_mgz_files 
+                   gtmseg.mgz"
   fi
 
   echo -e "$CONTAINER  Converting volumes to NIfTI files..."

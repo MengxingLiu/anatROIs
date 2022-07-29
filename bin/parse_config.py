@@ -90,6 +90,10 @@ def parse_config(args):
     if args.aparc2009:
         print(config['config']['aparc2009'])
 
+    # run gtmseg
+    if args.run_gtmseg:
+        print(config['config']['run_gtmseg'])
+
     # Get subject code from archive input
     if args.z:
         try:
@@ -126,6 +130,7 @@ if __name__ == '__main__':
     ap.add_argument('-r', action='store_true', help='Surface registration')
     ap.add_argument('-z', action='store_true', help='Get sub code from zip input')
     ap.add_argument('-aparc2009', action='store_true', help='separate aparc.a2009 ROIs')
+    ap.add_argument('-run_gtmseg', action='store_true', help='run gtmseg for PETsurfer')
     args = ap.parse_args()
 
     parse_config(args)
