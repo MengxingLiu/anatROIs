@@ -7,15 +7,13 @@
 # Example usage:
 #   docker run -v /path/to/your/subject:/input scitran/freesurfer-recon-all
 #
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 
 # Make directory for flywheel spec (v0)
 ENV FLYWHEEL /flywheel/v0
 RUN mkdir -p ${FLYWHEEL}
 WORKDIR ${FLYWHEEL}
 RUN mkdir /flywheel/v0/templates/
-
-
 
 # Install dependencies
 RUN apt-get update --fix-missing \
@@ -68,7 +66,7 @@ RUN apt-get update && apt-get install -y \
 
 
 # Download Freesurfer dev from MGH and untar to /opt
-RUN wget -N -qO- ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.3.0/freesurfer-linux-ubuntu18_amd64-7.3.0.tar.gz | tar -xz -C /opt && chown -R root:root /opt/freesurfer && chmod -R a+rx /opt/freesurfer
+RUN wget -N -qO- ftp://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/7.3.2/freesurfer-linux-ubuntu18_amd64-7.3.2.tar.gz | tar -xz -C /opt && chown -R root:root /opt/freesurfer && chmod -R a+rx /opt/freesurfer
  
 
 
@@ -120,8 +118,8 @@ RUN apt-get update -y && apt-get install -y ants
 RUN apt-get install -y libxt-dev libxmu-dev gawk
 ENV FREESURFER_HOME /opt/freesurfer
 ENV FREESURFER /opt/freesurfer
+RUN /opt/freesurfer/bin/fs_install_mcr R2019b
 
-RUN wget -N -qO- "https://surfer.nmr.mgh.harvard.edu/fswiki/MatlabRuntime?action=AttachFile&do=get&target=runtime2014bLinux.tar.gz" | tar -xz -C $FREESURFER_HOME && chown -R root:root /opt/freesurfer/MCRv84 && chmod -R a+rx /opt/freesurfer/MCRv84
 
 # Install neuropythy
 # (here it comes the update to python 3 for Neuropythy)
@@ -174,6 +172,7 @@ RUN wget --retry-connrefused --waitretry=5 --read-timeout=20 --timeout=15 -t 0 -
   && mkdir /flywheel/v0/templates/MNI_JHU_tracts_ROIs/ \
   && unzip "${FLYWHEEL}/MORI_ROIs.zip" -d /flywheel/v0/templates/MNI_JHU_tracts_ROIs/ \
   && rm "${FLYWHEEL}/MORI_ROIs.zip"
+RUN chmod -R 777 /flywheel/v0/templates
 
 # Add Thalamus FS LUT
 COPY FreesurferColorLUT_THALAMUS.txt /flywheel/v0/templates/FreesurferColorLUT_THALAMUS.txt
@@ -199,7 +198,6 @@ COPY compiled/fixAllSegmentations /usr/bin/fixAllSegmentations
 RUN chmod +x /usr/bin/fixAllSegmentations
 # There is a check in the sh for wmparc and other files, which are not working in infantFS, 
 # I copied the file and removed those lines as said by Eugenio and checking the whole thing now
-COPY compiled/segmentThalamicNuclei.sh /opt/freesurfer/bin/segmentThalamicNuclei.sh
 
 COPY bin/run \
       bin/run.py \

@@ -36,7 +36,7 @@ despacer () {
 ###############################################################################
 # Configure Freesurfer and MCR ENV
 
-export MCR_CACHE_FOLDER_NAME=.mcrCache8.4
+export MCR_CACHE_FOLDER_NAME=.mcrCache9.7
 
 export OS=Linux
 export FS_OVERRIDE=0
@@ -53,7 +53,7 @@ export MNI_DATAPATH=/opt/freesurfer/mni/data
 export FMRI_ANALYSIS_DIR=/opt/freesurfer/fsfast
 export PERL5LIB=/opt/freesurfer/mni/lib/perl5/5.8.5
 export MNI_PERL5LIB=/opt/freesurfer/mni/lib/perl5/5.8.5
-export XAPPLRESDIR=/opt/freesurfer/MCRv84/X11/app-defaults
+export XAPPLRESDIR=/opt/freesurfer/MCRv97/X11/app-defaults
 export PATH=/opt/freesurfer/bin:/opt/freesurfer/fsfast/bin
 export PATH=$PATH:/opt/freesurfer/tktools:/opt/freesurfer/mni/bin
 export PATH=$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
@@ -484,7 +484,7 @@ if [[ ${HCP} == "True" ]]; then
 fi
 
     
-export LD_LIBRARY_PATH=/opt/freesurfer/MCRv84/runtime/glnxa64:/opt/freesurfer/MCRv84/bin/glnxa64:/opt/freesurfer/MCRv84/sys/os/glnxa64:/opt/freesurfer/MCRv84/sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/opt/freesurfer/MCRv84/sys/java/jre/glnxa64/jre/lib/amd64/server:/opt/freesurfer/MCRv84/sys/java/jre/glnxa64/jre/lib/amd64
+export LD_LIBRARY_PATH=/opt/freesurfer/MCRv97/runtime/glnxa64:/opt/freesurfer/MCRv97/bin/glnxa64:/opt/freesurfer/MCRv97/sys/os/glnxa64:/opt/freesurfer/MCRv97/sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/opt/freesurfer/MCRv97/sys/java/jre/glnxa64/jre/lib/amd64/server:/opt/freesurfer/MCRv97/sys/java/jre/glnxa64/jre/lib/amd64
 
 
 # Segmentation of hippocampal subfields
@@ -538,7 +538,7 @@ if [[ ${THALAMUS} == "True" ]]; then
         ${FLYWHEEL_BASE}/fix_aseg_if_infant.py -mriDir ${MRI_DIR}
 
 
-        export LD_LIBRARY_PATH=/opt/freesurfer/MCRv84/runtime/glnxa64:/opt/freesurfer/MCRv84/bin/glnxa64:/opt/freesurfer/MCRv84/sys/os/glnxa64:/opt/freesurfer/MCRv84/sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/opt/freesurfer/MCRv84/sys/java/jre/glnxa64/jre/lib/amd64/server:/opt/freesurfer/MCRv84/sys/java/jre/glnxa64/jre/lib/amd64
+        export LD_LIBRARY_PATH=/opt/freesurfer/MCRv97/runtime/glnxa64:/opt/freesurfer/MCRv97/bin/glnxa64:/opt/freesurfer/MCRv97/sys/os/glnxa64:/opt/freesurfer/MCRv97/sys/java/jre/glnxa64/jre/lib/amd64/native_threads:/opt/freesurfer/MCRv97/sys/java/jre/glnxa64/jre/lib/amd64/server:/opt/freesurfer/MCRv97/sys/java/jre/glnxa64/jre/lib/amd64
     
         echo "$CONTAINER This is LD_LIBRARY_PATH: $LD_LIBRARY_PATH "
 
@@ -805,10 +805,9 @@ fi
 if [[ ${THALAMUS} == "True" ]]; then
     # separate nuclei from the ThalamicNuclei.T1.FSvoxelSpace.nii.gz
     # separate ROIs
-    cp "${MRI_DIR}"/ThalamicNuclei.v12.T1.FSvoxelSpace.fixed_FRAC_0.6.nii.gz "${OUTPUT_DIR}"/ThalamicNuclei.v12.T1.FSvoxelSpace.fixed_FRAC_0.6.nii.gz
-    cp ${OUTPUT_DIR}/ThalamicNuclei.v12.T1.FSvoxelSpace.fixed_FRAC_0.6.nii.gz ${FS_DIR}/ThalamicNuclei.v12.T1.FSvoxelSpace.fixed_FRAC_0.6.nii.gz
-    ${FLYWHEEL_BASE}/separateROIs.py -ThN ${FS_DIR}/ThalamicNuclei.v12.T1.FSvoxelSpace.fixed_FRAC_0.6.nii.gz \
-                                     -ThLUT ${TEMPLATES}/FreesurferColorLUT_THALAMUS.txt 
+    cp "${MRI_DIR}"/ThalamicNuclei.v13.T1.FSvoxelSpace.fixed_FRAC_0.6.nii.gz "${OUTPUT_DIR}"/ThalamicNuclei.v13.T1.FSvoxelSpace.fixed_FRAC_0.6.nii.gz
+    cp ${OUTPUT_DIR}/ThalamicNuclei.v13.T1.FSvoxelSpace.fixed_FRAC_0.6.nii.gz ${FS_DIR}/ThalamicNuclei.v13.T1.FSvoxelSpace.fixed_FRAC_0.6.nii.gz
+    ${FLYWHEEL_BASE}/separateROIs.py -ThN ${FS_DIR}/ThalamicNuclei.v13.T1.FSvoxelSpace.fixed_FRAC_0.6.nii.gz -ThLUT ${TEMPLATES}/FreesurferColorLUT_THALAMUS.txt 
     
 fi
 
