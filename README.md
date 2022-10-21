@@ -5,7 +5,7 @@
 
 * You *MUST* read and agree to the license agreement and [register with MGH before you use the software](https://surfer.nmr.mgh.harvard.edu/registration.html).
 * Once you get your license you can **edit the `example_config.json` file to include your license details before you build the container**. Without a license the execution of the code will fail.
-* This image is built with the Matlab MCRv84 included. The MCR is required to run the optional Hippocampal Subfields and Brainstem Structures processing
+* This image is built with the Matlab MCRv97 (2019b) included. The MCR is required to run the optional Hippocampal Subfields and Brainstem Structures processing
 
 
 ### Configuration Options ###
