@@ -4,12 +4,12 @@
 
 
 * You *MUST* read and agree to the license agreement and [register with MGH before you use the software](https://surfer.nmr.mgh.harvard.edu/registration.html).
-* Once you get your license you can **edit the `manifest.json` file to include your license details before you build the container**. Without a license the execution of the code will fail.
+* Once you get your license you can **edit the `example_config.json` file to include your license details before you build the container**. Without a license the execution of the code will fail.
 * This image is built with the Matlab MCRv84 included. The MCR is required to run the optional Hippocampal Subfields and Brainstem Structures processing
 
 
 ### Configuration Options ###
-Configuration for running the algorithm (and adding the license) are defined within `config.json`. 
+Configuration for running the algorithm (and adding the license) are defined within `example_config.json`. 
 
 
 ### Example Local Usage ###
@@ -19,12 +19,13 @@ This Gear is designed to run within [Flywheel](https://flywheel.io), however you
 docker run --rm -ti \
     -v </path/to/input/data>:/input/flywheel/v0/input/anatomical \
     -v </path/for/output/data>:/output \
-    garikoitz/freesurfer-ROI:<version-tag>
+    -v </path/for/example_config.json>:/flywheel/v0/config.json
+    garikoitz/anatROIs:<version-tag>
 ```
 
 #### Usage Notes ####
-* You must mount the directory (using the `-v` flag) which contains your anatomical data (nifti or dicoms) in the container at `/input/flywheel/v0/input/anatomical` and also mount the directory where you want your output data stored at `/output`, see the example above.
-* Configuration options (including the license key) must be set in the `manifest.json` file **before building** the container.
+* You must mount the directory (using the `-v` flag) which contains your anatomical data (nifti) in the container at `/input/flywheel/v0/input/anatomical` and also mount the directory where you want your output data stored at `/output`, see the example above.
+* Configuration options (including the license key) must be set in the `example_config.json` file **before building** the container.
 
 
 
